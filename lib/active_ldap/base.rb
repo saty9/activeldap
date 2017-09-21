@@ -1376,7 +1376,17 @@ module ActiveLdap
         if k == _dn_attribute
           new_dn_value = value[0]
         else
-          attributes.push([:replace, k, value])
+          # only one value changed (added or deleted)
+          if (v.size-value.size).abs == 1
+            if (value-v).size == 1
+              # value has one more item than v: add one value
+              attributes.push([:add, k, value-v])
+            else
+              attributes.push([:delete, k, v-value])
+            end
+          else
+            attributes.push([:replace, k, value])
+          end
         end
       end
 
